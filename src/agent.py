@@ -1,6 +1,6 @@
 from a2a.server.tasks import TaskUpdater
-from a2a.types import Message, TaskState, Part, TextPart
-from a2a.utils import get_message_text, new_agent_text_message
+from a2a.types import Message, Part, TextPart
+from a2a.utils import get_message_text
 
 from messenger import Messenger
 
@@ -16,7 +16,7 @@ class Agent:
         logger.info("Test Taker initializing")
 
         self.messenger = Messenger()
-        self.client = nebius.NeBiusClient(model="nemotron-3-nano-30b-a3b")
+        self.client = nebius.NeBiusClient(model="llama-3.3-70b-instruct")
 
     async def run(self, message: Message, updater: TaskUpdater) -> None:
         """Implement your agent logic here.
@@ -30,12 +30,8 @@ class Agent:
 
         prompt = get_message_text(message)
 
-        await updater.update_status(
-            TaskState.working, new_agent_text_message("Thinking...")
-        )
-
         response = self.client.generate_response(prompt)
-        text = response or ""
+        text = response or "nothing to say"
 
         await updater.add_artifact(
             parts=[Part(root=TextPart(text=text))],
