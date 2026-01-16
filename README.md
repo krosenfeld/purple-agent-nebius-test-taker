@@ -1,6 +1,5 @@
-# A2A Agent Template
+# Nebius test taker
 
-A minimal template for building [A2A (Agent-to-Agent)](https://a2a-protocol.org/latest/) agents.
 
 ## Project Structure
 
