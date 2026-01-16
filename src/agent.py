@@ -1,14 +1,22 @@
 from a2a.server.tasks import TaskUpdater
-from a2a.types import Message, TaskState, Part, TextPart
-from a2a.utils import get_message_text, new_agent_text_message
+from a2a.types import Message, Part, TextPart
+from a2a.utils import get_message_text
 
 from messenger import Messenger
 
+import nebius
+
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("test_taker")
 
 class Agent:
     def __init__(self):
+        logger.info("Test Taker initializing")
+
         self.messenger = Messenger()
-        # Initialize other state here
+        self.client = nebius.NeBiusClient(model="llama-3.3-70b-instruct")
 
     async def run(self, message: Message, updater: TaskUpdater) -> None:
         """Implement your agent logic here.
@@ -19,14 +27,13 @@ class Agent:
 
         Use self.messenger.talk_to_agent(message, url) to call other agents.
         """
-        input_text = get_message_text(message)
 
-        # Replace this example code with your agent logic
+        prompt = get_message_text(message)
 
-        await updater.update_status(
-            TaskState.working, new_agent_text_message("Thinking...")
-        )
+        response = self.client.generate_response(prompt)
+        text = response or "nothing to say"
+
         await updater.add_artifact(
-            parts=[Part(root=TextPart(text=input_text))],
-            name="Echo",
+            parts=[Part(root=TextPart(text=text))],
+            name="Response",
         )
